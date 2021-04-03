@@ -1,5 +1,7 @@
+import Foundation
 import Vapor
 import Fluent
+
 
 final class User: Model {
     static let schema = "users"
@@ -22,7 +24,7 @@ final class User: Model {
         self.password = password
     }
     
-    init(){}
+    init() {}
     
     final class Public: Content {
         var id: UUID?
@@ -53,27 +55,25 @@ extension EventLoopFuture where Value: User {
     }
 }
 
-extension Collection where Element: User{
+extension Collection where Element: User {
     func convertToPublic() -> [User.Public] {
-        return self.map {
-            $0.convertToPublic()
-        }
+        return self.map { $0.convertToPublic() }
     }
 }
 
 extension EventLoopFuture where Value == Array<User> {
     func convertToPublic() -> EventLoopFuture<[User.Public]> {
-        return self.map {
-            $0.convertToPublic()
-        }
+        return self.map { $0.convertToPublic() }
     }
 }
 
 extension User: ModelAuthenticatable {
+    
     static let usernameKey = \User.$username
     static let passwordHashKey = \User.$password
-    
+
     func verify(password: String) throws -> Bool  {
         try Bcrypt.verify(password, created: self.password)
     }
+    
 }

@@ -1,10 +1,10 @@
 import Vapor
+import Fluent
 
 final class Token: Content {
     var id: UUID?
     var tokenString: String
     var userId: UUID
-    
     
     init(tokenString: String, userId: UUID) {
         self.tokenString = tokenString
@@ -18,3 +18,5 @@ extension Token {
         return try Token(tokenString: random.base64, userId: user.requireID())
     }
 }
+
+

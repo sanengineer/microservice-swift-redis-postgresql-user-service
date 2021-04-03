@@ -3,7 +3,7 @@ import Vapor
 struct UsersController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         
-        let userRouteGroup = routes.grouped("users")
+        let userRouteGroup = routes.grouped("user")
         
         userRouteGroup.post( use: createHandler)
         userRouteGroup.get( use: getAllHandler)
