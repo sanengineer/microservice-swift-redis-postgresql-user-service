@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-postgresql-redis-on-server",
+    name: "swift-postgresql-redis-user-services",
     platforms: [
        .macOS(.v10_15)
     ],
