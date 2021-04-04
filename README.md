@@ -25,4 +25,4 @@ login user:
 
     /user/auth/login
     
-this auth used **Basic Auth**, which encode `username` and `password` as paylod to` base64 encode` and used **Bearer Auth**.
+this auth used **Basic Auth**, which encode to **base64**  `username` and `password` as payload and used **Bearer Auth**.
