@@ -5,7 +5,7 @@ struct UsersController: RouteCollection {
         
         let userRouteGroup = routes.grouped("user")
         
-        userRouteGroup.post( use: createHandler)
+        userRouteGroup.post("auth", "register", use: createHandler)
         userRouteGroup.get( use: getAllHandler)
         userRouteGroup.get(":user_id", use: getOneHanlder)
     }

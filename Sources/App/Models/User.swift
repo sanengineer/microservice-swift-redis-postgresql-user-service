@@ -13,7 +13,7 @@ final class User: Model {
     var username: String
     
     @Field(key: "email")
-    var email: String
+    var email: String?
     
     @Field(key: "password")
     var password: String
@@ -22,51 +22,51 @@ final class User: Model {
     var name: String
     
     @Field(key: "mobile")
-    var mobile: String
+    var mobile: String?
     
     @Field(key: "point_reward")
-    var point_reward: String
+    var point_reward: String?
     
-    @Field(key: "geo_loc")
-    var geo_loc: String
+    @Field(key: "geo_location")
+    var geo_location: String?
     
     @Field(key: "city")
-    var city: String
+    var city: String?
     
     @Field(key: "province")
-    var province: String
+    var province: String?
     
     @Field(key: "country")
-    var country: String
+    var country: String?
     
     @Field(key: "domicile")
-    var domicile: String
+    var domicile: String?
     
     @Field(key: "residence")
-    var residence: String
+    var residence: String?
     
     @Field(key: "shipping_address_default")
-    var shipping_address_default: String
+    var shipping_address_default: String?
     
     @Field(key: "shipping_address_id")
-    var shipping_address_id: UUID
+    var shipping_address_id: UUID?
     
     
     init(
         name: String,
         username: String,
         password: String,
-        email: String,
-        mobile: String,
-        point_reward: String,
-        geo_loc: String,
-        city: String,
-        province: String,
-        country: String,
-        domicile: String,
-        residence: String,
-        shipping_address_default: String,
-        shipping_address_id: UUID
+        email: String?,
+        mobile: String?,
+        point_reward: String?,
+        geo_location: String?,
+        city: String?,
+        province: String?,
+        country: String?,
+        domicile: String?,
+        residence: String?,
+        shipping_address_default: String?,
+        shipping_address_id: UUID?
         ){
         self.name = name
         self.username = username
@@ -75,7 +75,7 @@ final class User: Model {
         self.mobile = mobile
         self.city = city
         self.point_reward = point_reward
-        self.geo_loc = geo_loc
+        self.geo_location = geo_location
         self.province = province
         self.country = country
         self.domicile = domicile
@@ -104,33 +104,33 @@ final class User: Model {
         var id: UUID?
         var name: String
         var username: String
-        var email: String
-        var mobile: String
-        var point_reward: String
-        var geo_loc: String
-        var city: String
-        var province: String
-        var country: String
-        var domicile: String
-        var residence: String
-        var shipping_address_default: String
-        var shipping_address_id: UUID
+        var email: String?
+        var mobile: String?
+        var point_reward: String?
+        var geo_location: String?
+        var city: String?
+        var province: String?
+        var country: String?
+        var domicile: String?
+        var residence: String?
+        var shipping_address_default: String?
+        var shipping_address_id: UUID?
         
         init(
             id: UUID?,
             name: String,
             username: String,
-            email: String,
-            mobile: String,
-            point_reward: String,
-            geo_loc: String,
-            city: String,
-            province: String,
-            country: String,
-            domicile: String,
-            residence: String,
-            shipping_address_default: String,
-            shipping_address_id: UUID
+            email: String?,
+            mobile: String?,
+            point_reward: String?,
+            geo_location: String?,
+            city: String?,
+            province: String?,
+            country: String?,
+            domicile: String?,
+            residence: String?,
+            shipping_address_default: String?,
+            shipping_address_id: UUID?
         ){
             self.id = id
             self.name = name
@@ -139,7 +139,7 @@ final class User: Model {
             self.mobile = mobile
             self.city = city
             self.point_reward = point_reward
-            self.geo_loc = geo_loc
+            self.geo_location = geo_location
             self.province = province
             self.country = country
             self.domicile = domicile
@@ -161,7 +161,7 @@ extension User {
             email: email,
             mobile: mobile,
             point_reward: point_reward,
-            geo_loc: geo_loc,
+            geo_location: geo_location,
             city: city,
             province: province,
             country: country,
