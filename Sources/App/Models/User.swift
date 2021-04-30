@@ -98,8 +98,6 @@ final class User: Model {
         }
     }
     
-//    init(){}
-    
     final class Public: Content {
         var id: UUID?
         var name: String
@@ -155,7 +153,6 @@ extension User: Content {}
 
 final class UserUpdateBio: Codable, Content{
     
-//    var name: String
     var mobile: String?
     var point_reward: String?
     var geo_location: String?
@@ -169,7 +166,6 @@ final class UserUpdateBio: Codable, Content{
     
     
     init(
-//        name: String,
         mobile: String,
         point_reward: String,
         geo_location: String,
@@ -181,7 +177,6 @@ final class UserUpdateBio: Codable, Content{
         shipping_address_default: String,
         shipping_address_id: UUID
         ){
-//        self.name = name
         self.mobile = mobile
         self.city = city
         self.point_reward = point_reward

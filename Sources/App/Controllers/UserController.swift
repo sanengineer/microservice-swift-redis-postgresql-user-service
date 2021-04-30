@@ -6,7 +6,7 @@ struct UsersController: RouteCollection {
         let userRouteGroup = routes.grouped("user")
         
         userRouteGroup.post("auth", "register", use: createHandler)
-        userRouteGroup.put(":id", use: updateHandler)
+        userRouteGroup.put(":id", use: updateBioHandler)
         userRouteGroup.get( use: getAllHandler)
         userRouteGroup.get(":user_id", use: getOneHanlder)
     }
@@ -32,12 +32,8 @@ struct UsersController: RouteCollection {
             user.convertToPublic()
         }
     }
-//    
-//    func updateBioHandler(_req: Request) throws ->EventLoopFuture<User.Public> {
-//        return User
-//    }
     
-    func updateHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
+    func updateBioHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
         let id = req.parameters.get("id", as: UUID.self)
         let userUpdate = try req.content.decode(UserUpdateBio.self)
         
@@ -47,7 +43,6 @@ struct UsersController: RouteCollection {
             .flatMap{ user in
                 
                print("\n\nUSER:\n",user, "\n\n")
-//                user.name = userUpdate.name
                 user.mobile = userUpdate.mobile
                 user.point_reward = userUpdate.point_reward
                 user.geo_location = userUpdate.geo_location 
