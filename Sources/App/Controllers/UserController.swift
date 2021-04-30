@@ -6,6 +6,7 @@ struct UsersController: RouteCollection {
         let userRouteGroup = routes.grouped("user")
         
         userRouteGroup.post("auth", "register", use: createHandler)
+        userRouteGroup.put(":id", use: updateHandler)
         userRouteGroup.get( use: getAllHandler)
         userRouteGroup.get(":user_id", use: getOneHanlder)
     }
@@ -30,5 +31,22 @@ struct UsersController: RouteCollection {
         return user.save(on: req.db).map {
             user.convertToPublic()
         }
+    }
+    
+    func updateHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
+        let id = req.parameters.get("id", as: UUID.self)
+        let userUpdate = try req.content.decode(User.Public.self)
+        
+        return User
+            .find(id, on: req.db)
+            .unwrap(or: Abort(.notFound))
+            .flatMap{ user in
+                
+               print("USER:",user)
+                
+                return userUpdate.save(on: req.db).map{
+                    user.convertToPublic()
+                }
+            }
     }
 }
