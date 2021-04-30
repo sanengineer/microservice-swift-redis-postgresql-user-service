@@ -152,6 +152,50 @@ final class User: Model {
 
 extension User: Content {}
 
+
+final class UserUpdateBio: Codable, Content{
+    
+//    var name: String
+    var mobile: String?
+    var point_reward: String?
+    var geo_location: String?
+    var city: String?
+    var province: String?
+    var country: String?
+    var domicile: String?
+    var residence: String?
+    var shipping_address_default: String?
+    var shipping_address_id: UUID?
+    
+    
+    init(
+//        name: String,
+        mobile: String,
+        point_reward: String,
+        geo_location: String,
+        city: String,
+        province: String,
+        country: String,
+        domicile: String,
+        residence: String,
+        shipping_address_default: String,
+        shipping_address_id: UUID
+        ){
+//        self.name = name
+        self.mobile = mobile
+        self.city = city
+        self.point_reward = point_reward
+        self.geo_location = geo_location
+        self.province = province
+        self.country = country
+        self.domicile = domicile
+        self.residence = residence
+        self.shipping_address_default = shipping_address_default
+        self.shipping_address_id = shipping_address_id
+    }
+}
+
+
 extension User {
     func convertToPublic() -> User.Public {
         return User.Public(

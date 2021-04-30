@@ -32,10 +32,14 @@ struct UsersController: RouteCollection {
             user.convertToPublic()
         }
     }
+//    
+//    func updateBioHandler(_req: Request) throws ->EventLoopFuture<User.Public> {
+//        return User
+//    }
     
     func updateHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
         let id = req.parameters.get("id", as: UUID.self)
-        let userUpdate = try req.content.decode(User.self)
+        let userUpdate = try req.content.decode(UserUpdateBio.self)
         
         return User
             .find(id, on: req.db)
@@ -43,11 +47,10 @@ struct UsersController: RouteCollection {
             .flatMap{ user in
                 
                print("\n\nUSER:\n",user, "\n\n")
-                
-                user.name = userUpdate.name
+//                user.name = userUpdate.name
                 user.mobile = userUpdate.mobile
                 user.point_reward = userUpdate.point_reward
-                user.geo_location = userUpdate.geo_location
+                user.geo_location = userUpdate.geo_location 
                 user.city = userUpdate.city
                 user.province = userUpdate.province
                 user.country = userUpdate.country
