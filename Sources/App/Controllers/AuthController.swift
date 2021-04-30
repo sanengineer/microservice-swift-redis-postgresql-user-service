@@ -1,3 +1,4 @@
+
 import Vapor
 import Redis
 import Fluent
@@ -23,7 +24,7 @@ struct AuthController: RouteCollection {
     
     }
     
-    func authenticationHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
+    func authenticationHandler(_ req: Request) throws -> EventLoopFuture<User.Auth> {
         
         let data = try req.content.decode(AuthenticateData.self)
         
@@ -38,7 +39,7 @@ struct AuthController: RouteCollection {
                     .filter(\.$id == token.userId)
                     .first()
                     .unwrap(or: Abort(.notFound))
-                    .convertToPublic()
+                    .convertToAuth()
           
             }
         

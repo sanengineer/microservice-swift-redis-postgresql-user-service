@@ -39,7 +39,7 @@ func routes(_ app: Application) throws {
     
     app.logger.logLevel = .debug
     
-    app.migrations.add(CreateSchemaUser())
+    app.migrations.add(CreateSchemaUser(), AddSomeColumn(), UpdateDataTypeGeoLoc(), DeleteGeoLocOldDataType())
     
     try app.autoMigrate().wait()
     try app.register(collection: UsersController())
