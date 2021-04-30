@@ -8,6 +8,7 @@ struct UsersController: RouteCollection {
         userRouteGroup.post("auth", "register", use: createHandler)
         userRouteGroup.put(":id", use: updateBioHandler)
         userRouteGroup.get( use: getAllHandler)
+        userRouteGroup.get("count", use: getUsersNumber)
         userRouteGroup.get(":user_id", use: getOneHanlder)
     }
     
@@ -15,6 +16,11 @@ struct UsersController: RouteCollection {
         User.query(on: req.db)
             .all()
             .convertToPublic()
+    }
+    
+    func getUsersNumber(_ req: Request) -> EventLoopFuture<Int> {
+        User.query(on: req.db)
+            .count()
     }
     
     func getOneHanlder(_ req: Request) -> EventLoopFuture<User.Public> {
