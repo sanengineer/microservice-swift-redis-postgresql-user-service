@@ -8,7 +8,11 @@ func routes(_ app: Application) throws {
     let redisHostname: String
     let redisPort: Int
     
-    if let envPort = Environment.get("PORT_USER_SERVICE") {
+    guard let serverHostname = Environment.get("SERVER_HOSTNAME") else {
+        return print("No Env Server Hostname")
+    }
+    
+    if let envPort = Environment.get("SERVER_PORT") {
         port = Int(envPort) ?? 8081
     } else {
         port = 8081
@@ -31,13 +35,14 @@ func routes(_ app: Application) throws {
     app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
 
     app.databases.use(.postgres(
-            hostname: Environment.get("HOSTNAME")!,
-            username: Environment.get("USERNAME")!,
-            password: Environment.get("PASSWORD")!,
-            database: Environment.get("DATABASE")!),
+            hostname: Environment.get("DB_HOSTNAME")!,
+            username: Environment.get("DB_USERNAME")!,
+            password: Environment.get("DB_PASSWORD")!,
+            database: Environment.get("DB_NAME")!),
             as: .psql)
     
     app.logger.logLevel = .debug
+    app.http.server.configuration.hostname = serverHostname
     
     app.migrations.add(CreateSchemaUser(), AddSomeColumn(), UpdateDataTypeGeoLoc(), DeleteGeoLocOldDataType())
     
