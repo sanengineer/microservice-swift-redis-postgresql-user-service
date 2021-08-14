@@ -41,7 +41,7 @@ final class User: Model {
     
     @Field(key: "domicile")
     var domicile: String?
-    
+
     @Field(key: "residence")
     var residence: String?
     
@@ -50,6 +50,12 @@ final class User: Model {
     
     @Field(key: "shipping_address_id")
     var shipping_address_id: UUID?
+    
+    @Field(key: "date_of_birth")
+    var date_of_birth: String?
+
+    @Field(key: "gender")
+    var gender: String?
     
     
     init(
@@ -66,7 +72,9 @@ final class User: Model {
         domicile: String?,
         residence: String?,
         shipping_address_default: String?,
-        shipping_address_id: UUID?
+        shipping_address_id: UUID?,
+        date_of_birth: String?,
+        gender: String?
         ){
         self.name = name
         self.username = username
@@ -82,6 +90,8 @@ final class User: Model {
         self.residence = residence
         self.shipping_address_default = shipping_address_default
         self.shipping_address_id = shipping_address_id
+        self.date_of_birth = date_of_birth
+        self.gender = gender
     }
     
     init() {}
@@ -113,6 +123,8 @@ final class User: Model {
         var residence: String?
         var shipping_address_default: String?
         var shipping_address_id: UUID?
+        var date_of_birth: String?
+        var gender: String?
         
         init(
             id: UUID?,
@@ -128,7 +140,9 @@ final class User: Model {
             domicile: String?,
             residence: String?,
             shipping_address_default: String?,
-            shipping_address_id: UUID?
+            shipping_address_id: UUID?,
+            date_of_birth: String?,
+            gender: String?
         ){
             self.id = id
             self.name = name
@@ -144,6 +158,8 @@ final class User: Model {
             self.residence = residence
             self.shipping_address_default = shipping_address_default
             self.shipping_address_id = shipping_address_id
+            self.date_of_birth = date_of_birth
+            self.gender = gender
         }
     }
 }
@@ -153,16 +169,18 @@ extension User: Content {}
 
 final class UserUpdateBio: Codable, Content{
     
-    var mobile: String?
-    var point_reward: String?
-    var geo_location: String?
-    var city: String?
-    var province: String?
-    var country: String?
-    var domicile: String?
-    var residence: String?
-    var shipping_address_default: String?
-    var shipping_address_id: UUID?
+    var mobile: String
+    var point_reward: String? = ""
+    var geo_location: String? = ""
+    var city: String
+    var province: String
+    var country: String
+    var domicile: String
+    var residence: String
+    var shipping_address_default: String
+    var shipping_address_id: UUID? = nil
+    var date_of_birth: String
+    var gender: String
     
     
     init(
@@ -175,7 +193,9 @@ final class UserUpdateBio: Codable, Content{
         domicile: String,
         residence: String,
         shipping_address_default: String,
-        shipping_address_id: UUID
+        shipping_address_id: UUID,
+        date_of_birth: String,
+        gender: String
         ){
         self.mobile = mobile
         self.city = city
@@ -187,6 +207,8 @@ final class UserUpdateBio: Codable, Content{
         self.residence = residence
         self.shipping_address_default = shipping_address_default
         self.shipping_address_id = shipping_address_id
+        self.date_of_birth = date_of_birth
+        self.gender = gender
     }
 }
 
@@ -207,7 +229,9 @@ extension User {
             domicile: domicile,
             residence: residence,
             shipping_address_default: shipping_address_default,
-            shipping_address_id: shipping_address_id
+            shipping_address_id: shipping_address_id,
+            date_of_birth: date_of_birth,
+            gender: gender
         )
     }
     

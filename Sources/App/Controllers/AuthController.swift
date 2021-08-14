@@ -28,12 +28,18 @@ struct AuthController: RouteCollection {
         
         let data = try req.content.decode(AuthenticateData.self)
         
+        //debug
+        print("\n","DATA-AUTH_HANDLER:",data, "\n")
+        
         return req.redis
             .get(RedisKey(data.token), asJSON: Token.self)
             .flatMap { token in
                 guard let token = token else {
                     return req.eventLoop.future(error: Abort(.unauthorized))
                 }
+                
+                //debug
+                print("\n","AUTH_CONTROLLER-TOKEN_USERID:", token.userId,"\n", "AUTH_CONTROLLER-TOKEN_TOKEN_STRING:", token.tokenString ,"\n")
                 
                 return User.query(on: req.db)
                     .filter(\.$id == token.userId)
@@ -42,7 +48,6 @@ struct AuthController: RouteCollection {
                     .convertToAuth()
           
             }
-        
     }
 }
 

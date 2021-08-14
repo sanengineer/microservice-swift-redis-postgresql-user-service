@@ -4,12 +4,15 @@ struct UsersController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         
         let userRouteGroup = routes.grouped("user")
+        let userRouteGroupWithAuth = userRouteGroup.grouped(UserAuthMiddleware())
         
         userRouteGroup.post("auth", "register", use: createHandler)
-        userRouteGroup.put(":id", use: updateBioHandler)
-        userRouteGroup.get( use: getAllHandler)
-        userRouteGroup.get("count", use: getUsersNumber)
-        userRouteGroup.get(":user_id", use: getOneHanlder)
+        
+        userRouteGroupWithAuth.put(":id", use: updateBioHandler)
+        userRouteGroupWithAuth.get( use: getAllHandler)
+        userRouteGroupWithAuth.get("count", use: getUsersNumber)
+        userRouteGroupWithAuth.get(":user_id", use: getOneHanlder)
+        
     }
     
     func getAllHandler(_ req: Request) -> EventLoopFuture<[User.Public]> {
@@ -42,6 +45,7 @@ struct UsersController: RouteCollection {
     func updateBioHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
         let id = req.parameters.get("id", as: UUID.self)
         let userUpdate = try req.content.decode(UserUpdateBio.self)
+//        let userUpdate = try req.content.decode(User.self)
         
         return User
             .find(id, on: req.db)
@@ -49,6 +53,7 @@ struct UsersController: RouteCollection {
             .flatMap{ user in
                 
                print("\n\nUSER:\n",user, "\n\n")
+                
                 user.mobile = userUpdate.mobile
                 user.point_reward = userUpdate.point_reward
                 user.geo_location = userUpdate.geo_location 
@@ -59,6 +64,8 @@ struct UsersController: RouteCollection {
                 user.residence = userUpdate.residence
                 user.shipping_address_default = userUpdate.shipping_address_default
                 user.shipping_address_id = userUpdate.shipping_address_id
+                user.date_of_birth = userUpdate.date_of_birth
+                user.gender = userUpdate.gender
                 
                 return user.save(on: req.db).map{
                     user.convertToPublic()
