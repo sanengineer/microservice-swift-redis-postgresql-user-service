@@ -20,6 +20,9 @@ struct AuthController: RouteCollection {
         let user = try req.auth.require(User.self)
         let token = try Token.generate(for: user)
         
+        //debug
+        print("\n","LOGIN_USER", user,"\n","\n", "LOGIN_TOKEN:", token.tokenString, token.userId,"\n")
+        
         return req.redis.set(RedisKey(token.tokenString), toJSON: token).transform(to: token)
     
     }

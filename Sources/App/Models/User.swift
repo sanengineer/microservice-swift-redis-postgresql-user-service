@@ -13,7 +13,7 @@ final class User: Model {
     var username: String
     
     @Field(key: "email")
-    var email: String?
+    var email: String
     
     @Field(key: "password")
     var password: String
@@ -57,12 +57,15 @@ final class User: Model {
     @Field(key: "gender")
     var gender: String?
     
+    @Field(key: "role_id")
+    var role_id: Int?
+    
     
     init(
         name: String,
         username: String,
         password: String,
-        email: String?,
+        email: String,
         mobile: String?,
         point_reward: String?,
         geo_location: String?,
@@ -74,7 +77,8 @@ final class User: Model {
         shipping_address_default: String?,
         shipping_address_id: UUID?,
         date_of_birth: String?,
-        gender: String?
+        gender: String?,
+        role_id: Int?
         ){
         self.name = name
         self.username = username
@@ -92,6 +96,7 @@ final class User: Model {
         self.shipping_address_id = shipping_address_id
         self.date_of_birth = date_of_birth
         self.gender = gender
+        self.role_id = role_id
     }
     
     init() {}
@@ -107,6 +112,9 @@ final class User: Model {
             self.username = username
         }
     }
+    
+    
+   
     
     final class Public: Content {
         var id: UUID?
@@ -162,9 +170,12 @@ final class User: Model {
             self.gender = gender
         }
     }
+    
 }
 
 extension User: Content {}
+
+
 
 
 final class UserUpdateBio: Codable, Content{
@@ -238,6 +249,7 @@ extension User {
     func convertToAuth() -> User.Auth {
         return User.Auth(id: id, name: name, username: username)
     }
+    
 }
 
 
@@ -253,6 +265,8 @@ extension EventLoopFuture where Value: User {
             return user.convertToAuth()
         }
     }
+    
+   
 }
 
 extension Collection where Element: User {
@@ -263,6 +277,7 @@ extension Collection where Element: User {
     func convertToAuth() -> [User.Auth] {
         return self.map{ $0.convertToAuth() }
     }
+    
 }
 
 extension EventLoopFuture where Value == Array<User> {

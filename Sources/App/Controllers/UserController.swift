@@ -3,15 +3,13 @@ import Vapor
 struct UsersController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         
-        let userRouteGroup = routes.grouped("user")
-        let userRouteGroupWithAuth = userRouteGroup.grouped(UserAuthMiddleware())
-        
-        userRouteGroup.post("auth", "register", use: createHandler)
-        
-        userRouteGroupWithAuth.put(":id", use: updateBioHandler)
-        userRouteGroupWithAuth.get( use: getAllHandler)
-        userRouteGroupWithAuth.get("count", use: getUsersNumber)
-        userRouteGroupWithAuth.get(":user_id", use: getOneHanlder)
+        let userRouteGroup = routes.grouped("superuser")
+      
+    
+        userRouteGroup.put(":id", use: updateBioHandler)
+        userRouteGroup.get( use: getAllHandler)
+        userRouteGroup.get("count", use: getUsersNumber)
+        userRouteGroup.get(":user_id", use: getOneHanlder)
         
     }
     
@@ -37,10 +35,15 @@ struct UsersController: RouteCollection {
         let user = try req.content.decode(User.self)
         user.password = try Bcrypt.hash(user.password)
         
+        //debug
+        print("\n","USER_PAYLOADL:", user, "\n")
+        
         return user.save(on: req.db).map {
             user.convertToPublic()
         }
     }
+    
+    
     
     func updateBioHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
         let id = req.parameters.get("id", as: UUID.self)
