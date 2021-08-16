@@ -60,26 +60,25 @@ final class User: Model {
     @Field(key: "role_id")
     var role_id: Int?
     
+    @Field(key:"registrationToken")
+    var registrationToken: String?
     
-    init(
-        name: String,
-        username: String,
-        password: String,
-        email: String,
-        mobile: String?,
-        point_reward: String?,
-        geo_location: String?,
-        city: String?,
-        province: String?,
-        country: String?,
-        domicile: String?,
-        residence: String?,
-        shipping_address_default: String?,
-        shipping_address_id: UUID?,
-        date_of_birth: String?,
-        gender: String?,
-        role_id: Int?
-        ){
+    @Field(key:"isActive")
+    var isActive: Bool?
+    
+    @Field(key:"isBlocked")
+    var isBlocked: Bool?
+    
+    
+    @Field(key: "created_at")
+    var created_at: String?
+    
+    @Field(key: "updated_at")
+    var updated_at: String?
+    
+
+    init(name: String, username: String, password: String, email: String, mobile: String?, point_reward: String?, geo_location: String?, city: String?, province: String?, country: String?, domicile: String?, residence: String?, shipping_address_default: String?, shipping_address_id: UUID?, date_of_birth: String?, gender: String?, role_id: Int? = nil, registrationToken: String?, isActive: Bool?, isBlocked: Bool?, created_at: String?,updated_at: String?
+    ){
         self.name = name
         self.username = username
         self.password = password
@@ -97,30 +96,38 @@ final class User: Model {
         self.date_of_birth = date_of_birth
         self.gender = gender
         self.role_id = role_id
+        self.isActive = isActive
+        self.isBlocked = isBlocked
+        self.registrationToken = registrationToken
+        self.created_at = created_at
+        self.updated_at = updated_at
     }
     
     init() {}
     
-    final class Auth: Content {
+    final class GlobalAuth: Content, Authenticatable {
         var id: UUID?
         var name: String
         var username: String
+        var email: String
+        var registrationToken: String?
+        var role_id: Int?
         
-        init(id: UUID?, name: String, username: String) {
+        init(id: UUID?, name: String, username: String, email: String, registrationToken: String?, role_id: Int?) {
             self.id = id
             self.name = name
+            self.email = email
             self.username = username
+            self.registrationToken = registrationToken
+            self.role_id = role_id
         }
     }
-    
-    
-   
     
     final class Public: Content {
         var id: UUID?
         var name: String
         var username: String
-        var email: String?
+        var email: String
         var mobile: String?
         var point_reward: String?
         var geo_location: String?
@@ -133,24 +140,10 @@ final class User: Model {
         var shipping_address_id: UUID?
         var date_of_birth: String?
         var gender: String?
+        var created_at: String?
+        var updated_at: String?
         
-        init(
-            id: UUID?,
-            name: String,
-            username: String,
-            email: String?,
-            mobile: String?,
-            point_reward: String?,
-            geo_location: String?,
-            city: String?,
-            province: String?,
-            country: String?,
-            domicile: String?,
-            residence: String?,
-            shipping_address_default: String?,
-            shipping_address_id: UUID?,
-            date_of_birth: String?,
-            gender: String?
+        init( id: UUID?, name: String, username: String, email: String, mobile: String?, point_reward: String?, geo_location: String?, city: String?, province: String?, country: String?, domicile: String?, residence: String?, shipping_address_default: String?, shipping_address_id: UUID?, date_of_birth: String?, gender: String?, created_at: String?, updated_at: String?
         ){
             self.id = id
             self.name = name
@@ -168,6 +161,8 @@ final class User: Model {
             self.shipping_address_id = shipping_address_id
             self.date_of_birth = date_of_birth
             self.gender = gender
+            self.created_at = created_at
+            self.updated_at = updated_at
         }
     }
     
@@ -175,10 +170,29 @@ final class User: Model {
 
 extension User: Content {}
 
+extension User: Authenticatable {}
+
+struct Auth: Content, Authenticatable {
+    var id: UUID?
+    var name: String
+    var username: String
+    var email: String
+    var registrationToken: String?
+    var role_id: Int?
+    
+    init(id: UUID?, name: String, username: String, email: String, registrationToken: String?, role_id: Int?) {
+        self.id = id
+        self.name = name
+        self.email = email
+        self.username = username
+        self.registrationToken = registrationToken
+        self.role_id = role_id
+    }
+}
 
 
 
-final class UserUpdateBio: Codable, Content{
+final class RegularUserUpdateBio: Codable, Content{
     
     var mobile: String
     var point_reward: String? = ""
@@ -223,31 +237,58 @@ final class UserUpdateBio: Codable, Content{
     }
 }
 
+final class SuperUserUpdateBio: Codable, Content{
+    
+    var mobile: String
+    var point_reward: String? = ""
+    var geo_location: String? = ""
+    var city: String
+    var province: String
+    var country: String
+    var domicile: String
+    var residence: String
+    var shipping_address_default: String
+    var shipping_address_id: UUID? = nil
+    var date_of_birth: String
+    var gender: String
+    
+    
+    init(
+        mobile: String,
+        point_reward: String,
+        geo_location: String,
+        city: String,
+        province: String,
+        country: String,
+        domicile: String,
+        residence: String,
+        shipping_address_default: String,
+        shipping_address_id: UUID,
+        date_of_birth: String,
+        gender: String
+        ){
+        self.mobile = mobile
+        self.city = city
+        self.point_reward = point_reward
+        self.geo_location = geo_location
+        self.province = province
+        self.country = country
+        self.domicile = domicile
+        self.residence = residence
+        self.shipping_address_default = shipping_address_default
+        self.shipping_address_id = shipping_address_id
+        self.date_of_birth = date_of_birth
+        self.gender = gender
+    }
+}
 
 extension User {
     func convertToPublic() -> User.Public {
-        return User.Public(
-            id: id,
-            name: name,
-            username: username,
-            email: email,
-            mobile: mobile,
-            point_reward: point_reward,
-            geo_location: geo_location,
-            city: city,
-            province: province,
-            country: country,
-            domicile: domicile,
-            residence: residence,
-            shipping_address_default: shipping_address_default,
-            shipping_address_id: shipping_address_id,
-            date_of_birth: date_of_birth,
-            gender: gender
-        )
+        return User.Public( id: id, name: name, username: username, email: email, mobile: mobile, point_reward: point_reward, geo_location: geo_location, city: city, province: province, country: country, domicile: domicile, residence: residence, shipping_address_default: shipping_address_default, shipping_address_id: shipping_address_id, date_of_birth: date_of_birth, gender: gender, created_at: created_at, updated_at: updated_at)
     }
-    
-    func convertToAuth() -> User.Auth {
-        return User.Auth(id: id, name: name, username: username)
+  
+    func convertToGlobalAuth() -> User.GlobalAuth {
+        return User.GlobalAuth(id: id, name: name, username: username, email: email, registrationToken: registrationToken, role_id: role_id)
     }
     
 }
@@ -260,11 +301,17 @@ extension EventLoopFuture where Value: User {
         }
     }
     
-    func convertToAuth() -> EventLoopFuture<User.Auth> {
+    func convertToGlobalAuth() -> EventLoopFuture<User.GlobalAuth> {
         return self.map { user in
-            return user.convertToAuth()
+            return user.convertToGlobalAuth()
         }
     }
+    
+//    func convertToAuth() -> EventLoopFuture<User.RegularAuth> {
+//        return self.map { user in
+//            return user.convertToRegularAuth()
+//        }
+//    }
     
    
 }
@@ -274,8 +321,8 @@ extension Collection where Element: User {
         return self.map { $0.convertToPublic() }
     }
     
-    func convertToAuth() -> [User.Auth] {
-        return self.map{ $0.convertToAuth() }
+    func convertToGlobalAuth() -> [User.GlobalAuth] {
+        return self.map{ $0.convertToGlobalAuth() }
     }
     
 }
@@ -285,8 +332,8 @@ extension EventLoopFuture where Value == Array<User> {
         return self.map { $0.convertToPublic() }
     }
     
-    func convertToAuth() -> EventLoopFuture<[User.Auth]> {
-        return self.map { $0.convertToAuth() }
+    func convertToGlobalAuth() -> EventLoopFuture<[User.GlobalAuth]> {
+        return self.map { $0.convertToGlobalAuth() }
     }
 }
 

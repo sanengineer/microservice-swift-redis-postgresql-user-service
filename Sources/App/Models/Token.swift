@@ -17,11 +17,6 @@ extension Token {
         let random = [UInt8].random(count: 32)
         return try Token(tokenString: random.base64, userId: user.requireID())
     }
-    
-    static func generateRegister(for user: RegularUser) throws -> Token {
-        let random = [UInt8].random(count: 32)
-        return try Token(tokenString: random.base64, userId: user.requireID())
-    }
 
 }
 

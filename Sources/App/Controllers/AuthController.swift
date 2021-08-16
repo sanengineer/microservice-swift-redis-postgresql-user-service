@@ -5,13 +5,14 @@ import Fluent
 
 struct AuthController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        let authRoutesGroup = routes.grouped("user","auth")
+        
         let authMiddleware = User.authenticator()
-        
-        let authMiddlewareGroup = authRoutesGroup.grouped(authMiddleware)
-        
-        authMiddlewareGroup.post("login", use: loginHandler)
-        authRoutesGroup.post("authenticate", use: authenticationHandler)
+        let globalUserAuthRoutesGroup = routes.grouped("user",":role_id","auth")
+        let globalUserAuthMiddlewareGroup = globalUserAuthRoutesGroup.grouped(authMiddleware)
+    
+        globalUserAuthMiddlewareGroup.post("login", use: loginHandler)
+        globalUserAuthRoutesGroup.post("authenticate", use: authenticationGlobalUserHandler)
+
         
     }
     
@@ -27,8 +28,9 @@ struct AuthController: RouteCollection {
     
     }
     
-    func authenticationHandler(_ req: Request) throws -> EventLoopFuture<User.Auth> {
+    func authenticationGlobalUserHandler(_ req: Request) throws -> EventLoopFuture<User.GlobalAuth> {
         
+        let role_id = req.parameters.get("role_id", as: Int.self)
         let data = try req.content.decode(AuthenticateData.self)
         
         //debug
@@ -46,12 +48,14 @@ struct AuthController: RouteCollection {
                 
                 return User.query(on: req.db)
                     .filter(\.$id == token.userId)
+                    .filter(\.$role_id == role_id)
                     .first()
                     .unwrap(or: Abort(.notFound))
-                    .convertToAuth()
+                    .convertToGlobalAuth()
           
             }
     }
+    
 }
 
 struct AuthenticateData: Content {

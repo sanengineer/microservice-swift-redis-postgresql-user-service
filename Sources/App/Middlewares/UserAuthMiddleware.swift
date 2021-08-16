@@ -17,27 +17,54 @@ final class UserAuthMiddleware: Middleware {
             return request.eventLoop.future(error: Abort(.unauthorized))
         }
         
+        guard let id_params = request.parameters.get("id") else {
+            return request.eventLoop.future(error: Abort(.unauthorized))
+        }
+      
+        
+        //debug
+        print("\n", token, "\n")
+        print("\n", id_params, "\n")
+        
         return request
             .client
-            .post("http://\(authHostname):\(authPort)/user/auth/authenticate", beforeSend: {
+            .post("http://\(authHostname):\(authPort)/user/3/auth/authenticate", beforeSend: {
                 authRequest in
+                
+                //debug
+                print("\nAUTH_REQUEST",authRequest,"\n")
+                print("\nAUTH_DATA", try authRequest.content.encode(AuthenticateData(token:token.token)), "\n")
+                
                 
                 try authRequest.content.encode(AuthenticateData(token:token.token))
             })
         
             .flatMapThrowing { response in
-                guard response.status == .ok else {
+                guard let user_id = try response.content.decode(Auth.self).id.self else {
+                    throw Abort(.badRequest, reason: "USER_ID")
+                }
+                guard let params_uuid = UUID(uuidString: id_params) else {
+                    throw Abort(.unauthorized, reason: "PARAMS_UUID")
+                }
+                
+
+               if user_id == params_uuid {
+                guard response.status == .ok  else {
                     if response.status == .unauthorized {
-                        throw Abort(.unauthorized)
+                        throw Abort(.unauthorized, reason: "UNAUTHORIZED")
                     } else {
                         throw Abort(.internalServerError)
                     }
                 }
+                } else {
+                    throw Abort(.unauthorized)
+                }
+                       
                 
-                
-                let user = try response.content.decode(User.self)
-                
-                request.auth.login(user)
+                //debug
+//                print("\n","RESPONSE:\n", response,"\n")
+//                print("\n", "TRYYY\n", try response.content.decode(Auth.self), "\n")
+//                print("\n","USER:", user_id,"\n")
             }
         
             .flatMap {

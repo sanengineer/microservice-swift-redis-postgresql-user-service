@@ -9,7 +9,7 @@ struct UsersController: RouteCollection {
         userRouteGroup.put(":id", use: updateBioHandler)
         userRouteGroup.get( use: getAllHandler)
         userRouteGroup.get("count", use: getUsersNumber)
-        userRouteGroup.get(":user_id", use: getOneHanlder)
+        userRouteGroup.get(":id", use: getOneHanlder)
         
     }
     
@@ -25,12 +25,12 @@ struct UsersController: RouteCollection {
     }
     
     func getOneHanlder(_ req: Request) -> EventLoopFuture<User.Public> {
-        User.find(req.parameters.get("user_id"), on: req.db)
+        User.find(req.parameters.get("id"), on: req.db)
             .unwrap(or: Abort(.notFound))
             .convertToPublic()
     }
     
-    func createHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
+    func createHandler(_ req: Request) throws -> EventLoopFuture<User.GlobalAuth> {
         
         let user = try req.content.decode(User.self)
         user.password = try Bcrypt.hash(user.password)
@@ -39,7 +39,7 @@ struct UsersController: RouteCollection {
         print("\n","USER_PAYLOADL:", user, "\n")
         
         return user.save(on: req.db).map {
-            user.convertToPublic()
+            user.convertToGlobalAuth()
         }
     }
     
@@ -47,7 +47,7 @@ struct UsersController: RouteCollection {
     
     func updateBioHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
         let id = req.parameters.get("id", as: UUID.self)
-        let userUpdate = try req.content.decode(UserUpdateBio.self)
+        let userUpdate = try req.content.decode(SuperUserUpdateBio.self)
 //        let userUpdate = try req.content.decode(User.self)
         
         return User
