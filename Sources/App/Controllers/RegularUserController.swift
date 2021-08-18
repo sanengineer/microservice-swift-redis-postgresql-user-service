@@ -10,10 +10,15 @@ import Redis
 import Fluent
 
 struct RegularUserController: RouteCollection {
+    
+    let authHostname: String = Environment.get("SERVER_HOSTNAME")!
+    let authPort: Int = Int(Environment.get("SERVER_PORT")!)!
+    
     func boot(routes: RoutesBuilder) throws {
         
         let authMiddleware = User.authenticator()
         let userRouteGroup = routes.grouped("user")
+//        let userRegisterMiddleware = userRouteGroup.grouped(RegisterWithLoginMiddleware())
         let userRouteMiddlewareGroup = userRouteGroup.grouped(UserAuthMiddleware())
         
         //debug
@@ -28,14 +33,34 @@ struct RegularUserController: RouteCollection {
         let user = try req.content.decode(User.self)
         user.password = try Bcrypt.hash(user.password)
         user.role_id = 3
-       
-        //debug
-        print("\n","USER_PAYLOAD_INPUT:", user, "\n")
-
-        return user.save(on: req.db).map{
-            user.convertToGlobalAuth()
+          
+        let password_hash = user.password
+        
+        return user.save(on: req.db).flatMap{
+            User
+                .query(on: req.db)
+                .filter(\.$password == password_hash)
+                .first()
+                .unwrap(or: Abort(.notAcceptable, reason: "can't register, please use other username or email"))
+                .flatMap { data in
+          
+                    let random = [UInt8].random(count: 32)
+                    let token = RegistrationToken(tokenString: "\(String(describing:random.base64))", userId: "\(String(describing:data.id!))", username: "\(String(describing:data.username))")
+                    
+                    return req.redis.set(RedisKey(token.tokenString), toJSON: token).transform(to: token).flatMap { _ in
+                            User
+                              .query(on: req.db)
+                              .set(\.$registrationToken, to: token.tokenString)
+                              .update()
+                              .map {
+                                  User.GlobalAuth(id: user.id, name: user.name, username: user.username, email: user.email, registrationToken: token.tokenString, role_id: user.role_id)
+                              }
+                        }
+                   
+                }
+             }
         }
-    }
+
     
     func getOneUser(_ req: Request) -> EventLoopFuture<User.Public> {
         User.find(req.parameters.get("id"), on: req.db)
@@ -77,3 +102,4 @@ struct RegularUserController: RouteCollection {
     
     
 }
+

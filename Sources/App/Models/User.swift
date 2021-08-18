@@ -105,7 +105,7 @@ final class User: Model {
     
     init() {}
     
-    final class GlobalAuth: Content, Authenticatable {
+    final class GlobalAuth: Content, Authenticatable, Codable{
         var id: UUID?
         var name: String
         var username: String
@@ -113,7 +113,7 @@ final class User: Model {
         var registrationToken: String?
         var role_id: Int?
         
-        init(id: UUID?, name: String, username: String, email: String, registrationToken: String?, role_id: Int?) {
+        init(id: UUID? = nil, name: String, username: String, email: String, registrationToken: String?, role_id: Int?) {
             self.id = id
             self.name = name
             self.email = email
@@ -179,7 +179,7 @@ struct Auth: Content, Authenticatable {
     var email: String
     var registrationToken: String?
     var role_id: Int?
-    
+
     init(id: UUID?, name: String, username: String, email: String, registrationToken: String?, role_id: Int?) {
         self.id = id
         self.name = name
@@ -208,19 +208,7 @@ final class RegularUserUpdateBio: Codable, Content{
     var gender: String
     
     
-    init(
-        mobile: String,
-        point_reward: String,
-        geo_location: String,
-        city: String,
-        province: String,
-        country: String,
-        domicile: String,
-        residence: String,
-        shipping_address_default: String,
-        shipping_address_id: UUID,
-        date_of_birth: String,
-        gender: String
+    init( mobile: String, point_reward: String, geo_location: String, city: String, province: String, country: String, domicile: String, residence: String, shipping_address_default: String, shipping_address_id: UUID, date_of_birth: String, gender: String
         ){
         self.mobile = mobile
         self.city = city
@@ -253,19 +241,7 @@ final class SuperUserUpdateBio: Codable, Content{
     var gender: String
     
     
-    init(
-        mobile: String,
-        point_reward: String,
-        geo_location: String,
-        city: String,
-        province: String,
-        country: String,
-        domicile: String,
-        residence: String,
-        shipping_address_default: String,
-        shipping_address_id: UUID,
-        date_of_birth: String,
-        gender: String
+    init( mobile: String, point_reward: String, geo_location: String, city: String, province: String, country: String,domicile: String,residence: String, shipping_address_default: String,shipping_address_id: UUID, date_of_birth: String,gender: String
         ){
         self.mobile = mobile
         self.city = city
@@ -306,12 +282,6 @@ extension EventLoopFuture where Value: User {
             return user.convertToGlobalAuth()
         }
     }
-    
-//    func convertToAuth() -> EventLoopFuture<User.RegularAuth> {
-//        return self.map { user in
-//            return user.convertToRegularAuth()
-//        }
-//    }
     
    
 }

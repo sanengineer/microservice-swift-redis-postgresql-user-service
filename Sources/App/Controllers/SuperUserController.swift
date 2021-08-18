@@ -6,6 +6,7 @@ struct UsersController: RouteCollection {
         let userRouteGroup = routes.grouped("superuser")
       
     
+        userRouteGroup.post(use: createHandler)
         userRouteGroup.put(":id", use: updateBioHandler)
         userRouteGroup.get( use: getAllHandler)
         userRouteGroup.get("count", use: getUsersNumber)
