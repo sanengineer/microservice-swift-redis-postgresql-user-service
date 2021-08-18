@@ -10,21 +10,12 @@ import Redis
 import Fluent
 
 struct RegularUserController: RouteCollection {
-    
-    let authHostname: String = Environment.get("SERVER_HOSTNAME")!
-    let authPort: Int = Int(Environment.get("SERVER_PORT")!)!
-    
     func boot(routes: RoutesBuilder) throws {
-        
-        let authMiddleware = User.authenticator()
         let userRouteGroup = routes.grouped("user")
-//        let userRegisterMiddleware = userRouteGroup.grouped(RegisterWithLoginMiddleware())
         let userRouteMiddlewareGroup = userRouteGroup.grouped(UserAuthMiddleware())
+     
         
-        //debug
-        print("\nTESTTTT",authMiddleware, "\n")
-        
-        routes.post("auth","register", use: createUser)
+        userRouteGroup.post("auth","register", use: createUser)
         userRouteMiddlewareGroup.get(":id", use: getOneUser)
         userRouteMiddlewareGroup.put(":id", use: updateUserBio)
     }
@@ -40,7 +31,7 @@ struct RegularUserController: RouteCollection {
             User
                 .query(on: req.db)
                 .filter(\.$password == password_hash)
-                .first()
+                .first() 
                 .unwrap(or: Abort(.notAcceptable, reason: "can't register, please use other username or email"))
                 .flatMap { data in
           
@@ -51,6 +42,7 @@ struct RegularUserController: RouteCollection {
                             User
                               .query(on: req.db)
                               .set(\.$registrationToken, to: token.tokenString)
+                              .filter(\.$password == password_hash)
                               .update()
                               .map {
                                   User.GlobalAuth(id: user.id, name: user.name, username: user.username, email: user.email, registrationToken: token.tokenString, role_id: user.role_id)
