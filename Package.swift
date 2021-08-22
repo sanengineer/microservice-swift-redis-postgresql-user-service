@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-postgresql-redis-user-services",
+    name: "microservices-swift-postgresql-redis-superuser-services",
     platforms: [
        .macOS(.v10_15)
     ],
