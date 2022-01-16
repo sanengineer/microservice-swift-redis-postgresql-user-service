@@ -7,7 +7,7 @@ struct AuthController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         
         let authMiddleware = User.authenticator()
-        let globalUserAuthRoutesGroup = routes.grouped("user",":role_id","auth")
+        let globalUserAuthRoutesGroup = routes.grouped("superuser","auth")
         let globalUserAuthMiddlewareGroup = globalUserAuthRoutesGroup.grouped(authMiddleware)
     
         globalUserAuthMiddlewareGroup.post("login", use: loginHandler)
