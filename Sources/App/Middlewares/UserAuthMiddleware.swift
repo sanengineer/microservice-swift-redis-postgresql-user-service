@@ -6,6 +6,7 @@
 //
 
 import Vapor
+import Fluent
 
 final class UserAuthMiddleware: Middleware {
     
@@ -17,54 +18,66 @@ final class UserAuthMiddleware: Middleware {
             return request.eventLoop.future(error: Abort(.unauthorized))
         }
         
-        guard let id_params = request.parameters.get("id") else {
-            return request.eventLoop.future(error: Abort(.unauthorized))
-        }
-      
+        // guard let id_params = request.parameters.get("id") else {
+        //     return request.eventLoop.future(error: Abort(.badRequest))
+        // }
         
         //debug
-        print("\n", token, "\n")
-        print("\n", id_params, "\n")
+        print("\n","HEADER_TOKEN: ", token)
+        // print("\n", "TEST", test)
+        
+        // print("\n","PARAMS_ID: ",id_params, "\n")
         
         return request
             .client
-            .post("http://\(authHostname):\(authPort)/user/3/auth/authenticate", beforeSend: {
+            .post("http://\(authHostname):\(authPort)/user/auth/authenticate", beforeSend: {
                 authRequest in
                 
                 //debug
-                print("\nAUTH_REQUEST",authRequest,"\n")
-                print("\nAUTH_DATA", try authRequest.content.encode(AuthenticateData(token:token.token)), "\n")
+                // print("\nAUTH_REQUEST: ", try authRequest.content.encode(AuthenticateData(token:token.token), as: .json))
+                // print("\nAUTH_DATA: ", try authRequest.content.encode(AuthenticateData(token:token.token)), "\n")
                 
-                
-                try authRequest.content.encode(AuthenticateData(token:token.token))
+                try authRequest.content.encode(AuthenticateData(token:token.token), as: .json)
             })
         
             .flatMapThrowing { response in
-                guard let user_id = try response.content.decode(Auth.self).id.self else {
-                    throw Abort(.badRequest, reason: "USER_ID")
-                }
-                guard let params_uuid = UUID(uuidString: id_params) else {
-                    throw Abort(.unauthorized, reason: "PARAMS_UUID")
-                }
-                
-
-               if user_id == params_uuid {
-                guard response.status == .ok  else {
-                    if response.status == .unauthorized {
-                        throw Abort(.unauthorized, reason: "UNAUTHORIZED")
-                    } else {
-                        throw Abort(.internalServerError)
-                    }
-                }
-                } else {
+                guard let auth = try response.content.decode(Auth.self).role_id, auth == 1 else {
                     throw Abort(.unauthorized)
                 }
+
+                // guard let  = try response.content.decode(Auth.self).role_id.self else {
+                //     throw Abort(.badRequest, reason: "ROLE_ID")
+                // }
+
+
+                // guard let params_uuid = UUID(uuidString: id_params) else {
+                //     throw Abort(.unauthorized, reason: "PARAMS_UUID")
+                // }
+                
+
+            //    if user_id == params_uuid {
+            //     guard response.status == .ok  else {
+            //         if response.status == .unauthorized {
+            //             throw Abort(.unauthorized, reason: "UNAUTHORIZED")
+            //         } else {
+            //             throw Abort(.internalServerError)
+            //         }
+            //     }
+            //     } else {
+            //         throw Abort(.unauthorized)
+            //     }
+
+            //   let data = User.query(on: request.db)
+            //    .filter(\.$id == user_id)
+            //    .all()
                        
                 
-                //debug
-//                print("\n","RESPONSE:\n", response,"\n")
-//                print("\n", "TRYYY\n", try response.content.decode(Auth.self), "\n")
-//                print("\n","USER:", user_id,"\n")
+               //debug
+               print("\n","RESPONSE:\n", response,"\n")
+            //    print("\n", "TRYYY\n", try response.content.decode(Auth.self), "\n")
+               print("\n","USER:", auth,"\n")
+            //    print("\n","QUERY_DB:", data.self,"\n")
+            
             }
         
             .flatMap {

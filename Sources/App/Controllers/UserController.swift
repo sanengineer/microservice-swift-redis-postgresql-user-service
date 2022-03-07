@@ -3,15 +3,20 @@ import Vapor
 struct UsersController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         
-        let userRouteGroup = routes.grouped("superuser")
-      
+        let adminMiddleware = AdminAuthMiddleware()
+        let routeGroup = routes.grouped("user")
+        let routeGroupMiddleware = routeGroup.grouped(adminMiddleware)
+
+
+        // let testGroup = routes.grouped("user")
+
+        routeGroupMiddleware.get( use: getAllHandler)
+        // testGroup.get("count", use: getUsersNumber)
+        routeGroupMiddleware.get("count", use: getUsersNumber)
+        routeGroupMiddleware.get(":id", use: getOneHanlder)
+        routeGroupMiddleware.post(use: createHandler)
+        routeGroupMiddleware.put(":id", use: updateBioHandler)
     
-        userRouteGroup.post(use: createHandler)
-        userRouteGroup.put(":id", use: updateBioHandler)
-        userRouteGroup.get( use: getAllHandler)
-        userRouteGroup.get("count", use: getUsersNumber)
-        userRouteGroup.get(":id", use: getOneHanlder)
-        
     }
     
     func getAllHandler(_ req: Request) -> EventLoopFuture<[User.Public]> {
@@ -20,8 +25,12 @@ struct UsersController: RouteCollection {
             .convertToPublic()
     }
     
-    func getUsersNumber(_ req: Request) -> EventLoopFuture<Int> {
-        User.query(on: req.db)
+    func getUsersNumber(_ req: Request) throws -> EventLoopFuture<Int> {
+        // let token = try req.
+
+        // print("\n","PARAM_QUERY_TOKEN", token )
+        
+       return User.query(on: req.db)
             .count()
     }
     
@@ -48,7 +57,7 @@ struct UsersController: RouteCollection {
     
     func updateBioHandler(_ req: Request) throws -> EventLoopFuture<User.Public> {
         let id = req.parameters.get("id", as: UUID.self)
-        let userUpdate = try req.content.decode(SuperUserUpdateBio.self)
+        let userUpdate = try req.content.decode(UserUpdateBio.self)
 //        let userUpdate = try req.content.decode(User.self)
         
         return User

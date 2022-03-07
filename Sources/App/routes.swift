@@ -3,6 +3,7 @@ import FluentPostgresDriver
 import Fluent
 import Redis
 
+
 func routes(_ app: Application) throws {
     let port: Int
     let redisHostname: String
@@ -36,6 +37,7 @@ func routes(_ app: Application) throws {
 
     app.databases.use(.postgres(
             hostname: Environment.get("DB_HOSTNAME")!,
+            port: Environment.get("DB_PORT").flatMap(Int.init(_:))!,
             username: Environment.get("DB_USERNAME")!,
             password: Environment.get("DB_PASSWORD")!,
             database: Environment.get("DB_NAME")!),
@@ -44,11 +46,18 @@ func routes(_ app: Application) throws {
     app.logger.logLevel = .debug
     app.http.server.configuration.hostname = serverHostname
     
-    app.migrations.add(CreateSchemaUser(), AddSomeColumn(), UpdateDataTypeGeoLoc(), DeleteGeoLocOldDataType(), AddGenderDobColumn(), CreateSchemaRoles(), AddSomeColumnOnSchemaUserPart2())
+    app.migrations.add(
+        CreateSchemaRoles(),
+        CreateSchemaUser(),
+        SeedDBRoles()
+    )
     
+    //migration
     try app.autoMigrate().wait()
+
     try app.register(collection: UsersController())
-    try app.register(collection: RegularUserController())
+    try app.register(collection: RolesController())
+    // try app.register(collection: RegularUserController())
     try app.register(collection: AuthController())
     
 }

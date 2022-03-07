@@ -22,6 +22,12 @@ final class Role: Model {
     
     @Field(key: "description")
     var description: String
+
+    @Timestamp(key: "created_at", on:.create)
+    var created_at: Date?
+    
+    @Timestamp(key: "updated_at", on: .update)
+    var updated_at: Date?
     
     init() {}
     

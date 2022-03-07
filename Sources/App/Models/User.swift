@@ -70,14 +70,14 @@ final class User: Model {
     var isBlocked: Bool?
     
     
-    @Field(key: "created_at")
-    var created_at: String?
+    @Timestamp(key: "created_at", on: .create)
+    var created_at: Date?
     
-    @Field(key: "updated_at")
-    var updated_at: String?
+    @Timestamp(key: "updated_at", on: .update)
+    var updated_at: Date?
     
 
-    init(name: String, username: String, password: String, email: String, mobile: String?, point_reward: String?, geo_location: String?, city: String?, province: String?, country: String?, domicile: String?, residence: String?, shipping_address_default: String?, shipping_address_id: UUID?, date_of_birth: String?, gender: String?, role_id: Int? = nil, registrationToken: String?, isActive: Bool?, isBlocked: Bool?, created_at: String?,updated_at: String?
+    init(name: String, username: String, password: String, email: String, mobile: String?, point_reward: String?, geo_location: String?, city: String?, province: String?, country: String?, domicile: String?, residence: String?, shipping_address_default: String?, shipping_address_id: UUID?, date_of_birth: String?, gender: String?, role_id: Int? = nil, registrationToken: String?, isActive: Bool?, isBlocked: Bool?
     ){
         self.name = name
         self.username = username
@@ -99,8 +99,6 @@ final class User: Model {
         self.isActive = isActive
         self.isBlocked = isBlocked
         self.registrationToken = registrationToken
-        self.created_at = created_at
-        self.updated_at = updated_at
     }
     
     init() {}
@@ -140,10 +138,10 @@ final class User: Model {
         var shipping_address_id: UUID?
         var date_of_birth: String?
         var gender: String?
-        var created_at: String?
-        var updated_at: String?
+        var created_at: Date?
+        var updated_at: Date?
         
-        init( id: UUID?, name: String, username: String, email: String, mobile: String?, point_reward: String?, geo_location: String?, city: String?, province: String?, country: String?, domicile: String?, residence: String?, shipping_address_default: String?, shipping_address_id: UUID?, date_of_birth: String?, gender: String?, created_at: String?, updated_at: String?
+        init( id: UUID?, name: String, username: String, email: String, mobile: String?, point_reward: String?, geo_location: String?, city: String?, province: String?, country: String?, domicile: String?, residence: String?, shipping_address_default: String?, shipping_address_id: UUID?, date_of_birth: String?, gender: String?, created_at: Date?, updated_at: Date?
         ){
             self.id = id
             self.name = name
@@ -191,41 +189,17 @@ struct Auth: Content, Authenticatable {
 }
 
 
+struct UrlQuery: Content {
+    let token: String
 
-final class RegularUserUpdateBio: Codable, Content{
-    
-    var mobile: String
-    var point_reward: String? = ""
-    var geo_location: String? = ""
-    var city: String
-    var province: String
-    var country: String
-    var domicile: String
-    var residence: String
-    var shipping_address_default: String
-    var shipping_address_id: UUID? = nil
-    var date_of_birth: String
-    var gender: String
-    
-    
-    init( mobile: String, point_reward: String, geo_location: String, city: String, province: String, country: String, domicile: String, residence: String, shipping_address_default: String, shipping_address_id: UUID, date_of_birth: String, gender: String
-        ){
-        self.mobile = mobile
-        self.city = city
-        self.point_reward = point_reward
-        self.geo_location = geo_location
-        self.province = province
-        self.country = country
-        self.domicile = domicile
-        self.residence = residence
-        self.shipping_address_default = shipping_address_default
-        self.shipping_address_id = shipping_address_id
-        self.date_of_birth = date_of_birth
-        self.gender = gender
+    init(token: String){
+        self.token = token
     }
 }
 
-final class SuperUserUpdateBio: Codable, Content{
+
+
+final class UserUpdateBio: Codable, Content{
     
     var mobile: String
     var point_reward: String? = ""
