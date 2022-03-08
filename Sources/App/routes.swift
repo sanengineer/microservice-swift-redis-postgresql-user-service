@@ -8,6 +8,7 @@ func routes(_ app: Application) throws {
     let port: Int
     let redisHostname: String
     let redisPort: Int
+    let redisUrl: String
     
     guard let serverHostname = Environment.get("SERVER_HOSTNAME") else {
         return print("No Env Server Hostname")
@@ -31,9 +32,16 @@ func routes(_ app: Application) throws {
     } else {
         redisPort = 6379
     }
+
+    if let redisUrlEnv = Environment.get("REDIS_URL"){
+        redisUrl = redisUrlEnv
+    } else {
+        redisUrl = "http://(\(redisHostname)):(\(redisPort))"
+    }
     
     app.http.server.configuration.port = port
-    app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
+    // app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
+    app.redis.configuration = try RedisConfiguration(url: redisUrl)
 
     app.databases.use(.postgres(
             hostname: Environment.get("DB_HOSTNAME")!,

@@ -12,6 +12,7 @@ final class UserAuthMiddleware: Middleware {
     
     let authHostname: String = Environment.get("SERVER_HOSTNAME")!
     let authPort: Int = Int(Environment.get("SERVER_PORT")!)!
+    let authUrl: String = Environment.get("SERVER_URL")!
 
     func respond(to request: Request, chainingTo next: Responder) -> EventLoopFuture<Response> {
         guard let token = request.headers.bearerAuthorization else {
@@ -30,7 +31,7 @@ final class UserAuthMiddleware: Middleware {
         
         return request
             .client
-            .post("http://\(authHostname):\(authPort)/user/auth/authenticate", beforeSend: {
+            .post("(\(authUrl)))/user/auth/authenticate", beforeSend: {
                 authRequest in
                 
                 //debug
