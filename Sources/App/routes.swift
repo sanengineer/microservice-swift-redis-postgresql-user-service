@@ -68,8 +68,7 @@ func routes(_ app: Application) throws {
     app.migrations.add(
         CreateSchemaRoles(),
         CreateSchemaUser(),
-        SeedDBRoles()
-    )
+        SeedDBRoles(), to: .psql)
     
     //migration
     try app.autoMigrate().wait()
