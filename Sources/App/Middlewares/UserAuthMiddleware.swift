@@ -31,7 +31,7 @@ final class UserAuthMiddleware: Middleware {
         
         return request
             .client
-            .post("(\(authUrl)))/user/auth/authenticate", beforeSend: {
+            .post("(\(authUrl)/user/auth/authenticate", beforeSend: {
                 authRequest in
                 
                 //debug

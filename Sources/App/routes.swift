@@ -33,7 +33,7 @@ func routes(_ app: Application) throws {
         redisPort = 6379
     }
 
-    if let redisUrlEnv = Environment.get("REDIS_URL"){
+    if let redisUrlEnv = Environment.get("REDIS_TLS_URL"){
         redisUrl = redisUrlEnv
     } else {
         redisUrl = "http://(\(redisHostname)):(\(redisPort))"
