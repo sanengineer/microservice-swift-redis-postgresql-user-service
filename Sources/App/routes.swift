@@ -57,14 +57,14 @@ func routes(_ app: Application) throws {
     app.http.server.configuration.port = port
     app.http.server.configuration.hostname = serverHostname
     
-    // app.migrations.add(
-    //     CreateSchemaRoles(),
-    //     CreateSchemaUser(),
-    //     SeedDBRoles()
-    // )
+    app.migrations.add(
+        CreateSchemaRoles(),
+        CreateSchemaUser(),
+        SeedDBRoles()
+    )
     
     //migration
-    try app.autoMigrate().wait()
+    // try app.autoMigrate().wait()
 
     try app.register(collection: UsersController())
     try app.register(collection: RolesController())
