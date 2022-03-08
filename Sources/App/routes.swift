@@ -9,6 +9,7 @@ func routes(_ app: Application) throws {
     let redisHostname: String
     let redisPort: Int
     let redisUrl: String
+    let dbUrl: String
     
     guard let serverHostname = Environment.get("SERVER_HOSTNAME") else {
         return print("No Env Server Hostname")
@@ -45,13 +46,20 @@ func routes(_ app: Application) throws {
     // app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
     // app.redis.configuration = try RedisConfiguration(url: redisUrl)
 
-    app.databases.use(.postgres(
+    if let dbUrlEnv = Environment.get("DATABASE_URL"){
+        dbUrl = dbUrlEnv
+        app.databases.use(try .postgres(url: dbUrl), as: .psql)
+    } else {
+        app.databases.use(.postgres(
             hostname: Environment.get("DB_HOSTNAME")!,
             port: Environment.get("DB_PORT").flatMap(Int.init(_:))!,
             username: Environment.get("DB_USERNAME")!,
             password: Environment.get("DB_PASSWORD")!,
             database: Environment.get("DB_NAME")!),
             as: .psql)
+    }
+
+    
     
     app.logger.logLevel = .debug
     app.http.server.configuration.port = port
