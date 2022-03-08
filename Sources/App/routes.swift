@@ -64,7 +64,7 @@ func routes(_ app: Application) throws {
     )
     
     //migration
-    // try app.autoMigrate().wait()
+    try app.autoMigrate().wait()
 
     try app.register(collection: UsersController())
     try app.register(collection: RolesController())
