@@ -35,13 +35,15 @@ func routes(_ app: Application) throws {
 
     if let redisUrlEnv = Environment.get("REDIS_TLS_URL"){
         redisUrl = redisUrlEnv
+        app.redis.configuration = try RedisConfiguration(url: redisUrl)
     } else {
-        redisUrl = "http://(\(redisHostname)):(\(redisPort))"
+        // redisUrl = "http://\(redisHostname):\(redisPort)"
+        app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
     }
     
-    app.http.server.configuration.port = port
+  
     // app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
-    app.redis.configuration = try RedisConfiguration(url: redisUrl)
+    // app.redis.configuration = try RedisConfiguration(url: redisUrl)
 
     app.databases.use(.postgres(
             hostname: Environment.get("DB_HOSTNAME")!,
@@ -52,13 +54,14 @@ func routes(_ app: Application) throws {
             as: .psql)
     
     app.logger.logLevel = .debug
+    app.http.server.configuration.port = port
     app.http.server.configuration.hostname = serverHostname
     
-    app.migrations.add(
-        CreateSchemaRoles(),
-        CreateSchemaUser(),
-        SeedDBRoles()
-    )
+    // app.migrations.add(
+    //     CreateSchemaRoles(),
+    //     CreateSchemaUser(),
+    //     SeedDBRoles()
+    // )
     
     //migration
     try app.autoMigrate().wait()

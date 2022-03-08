@@ -14,7 +14,7 @@ struct UsersController: RouteCollection {
         // testGroup.get("count", use: getUsersNumber)
         routeGroupMiddleware.get("count", use: getUsersNumber)
         routeGroupMiddleware.get(":id", use: getOneHanlder)
-        routeGroupMiddleware.post(use: createHandler)
+        routeGroup.post(use: createHandler)
         routeGroupMiddleware.put(":id", use: updateBioHandler)
     
     }
