@@ -47,11 +47,18 @@ public func configure(_ app: Application) throws {
     // app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
     // app.redis.configuration = try RedisConfiguration(url: redisUrl)
 
-    if let dbUrlEnv = Environment.get("DATABASE_URL"){
-        dbUrl = dbUrlEnv
-        try app.databases.use(.postgres(url: dbUrl), as: .psql)
-        print("DB_URL: \(dbUrl)")
+    if let dbUrlEnv = Environment.get("DATABASE_URL"), var postgresConfig = PostgresConfiguration(url: dbUrlEnv) {
+        postgresConfig.tlsConfiguration = .makeClientConfiguration()
+        postgresConfig.tlsConfiguration?.certificateVerification = .none
+        app.databases.use(.postgres(
+            configuration: postgresConfig
+        ), as: .psql)
     } else {
+    // if let dbUrlEnv = Environment.get("DATABASE_URL"){
+    //     dbUrl = dbUrlEnv
+    //     try app.databases.use(.postgres(url: dbUrl), as: .psql)
+    //     print("DB_URL: \(dbUrl)")
+    // } else {
         app.databases.use(.postgres(
             hostname: Environment.get("DB_HOSTNAME")!,
             port: Environment.get("DB_PORT").flatMap(Int.init(_:))!,
@@ -60,8 +67,6 @@ public func configure(_ app: Application) throws {
             database: Environment.get("DB_NAME")!),
             as: .psql)
     }
-
-    
     
     app.logger.logLevel = .debug
     app.http.server.configuration.port = port
