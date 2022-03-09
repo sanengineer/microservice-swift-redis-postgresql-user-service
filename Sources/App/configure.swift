@@ -10,7 +10,7 @@ public func configure(_ app: Application) throws {
     let redisHostname: String
     let redisPort: Int
     let redisUrl: String
-    let dbUrl: String
+    // let dbUrl: String
     
     guard let serverHostname = Environment.get("SERVER_HOSTNAME") else {
         return print("No Env Server Hostname")
