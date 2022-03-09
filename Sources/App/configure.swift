@@ -35,7 +35,7 @@ public func configure(_ app: Application) throws {
     //     redisPort = 6379
     // }
 
-    guard let redisUrlEnv = Environment.get("REDIS_TLS_URL") else {
+    guard let redisUrlEnv = Environment.get("REDIS_URL") else {
         return print("No Env REDIS_URL")
     }
     redisUrl = redisUrlEnv
