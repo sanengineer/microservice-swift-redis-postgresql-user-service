@@ -6,21 +6,21 @@ import Redis
 
 public func configure(_ app: Application) throws {
     
-    let port: Int
+    // let port: Int
     let redisHostname: String
     let redisPort: Int
     let redisUrl: String
     // let dbUrl: String
     
-    guard let serverHostname = Environment.get("SERVER_HOSTNAME") else {
-        return print("No Env Server Hostname")
-    }
+    // guard let serverHostname = Environment.get("SERVER_HOSTNAME") else {
+    //     return print("No Env Server Hostname")
+    // }
     
-    if let envPort = Environment.get("SERVER_PORT") {
-        port = Int(envPort) ?? 8081
-    } else {
-        port = 8081
-    }
+    // if let envPort = Environment.get("SERVER_PORT") {
+    //     port = Int(envPort) ?? 8081
+    // } else {
+    //     port = 8081
+    // }
     
     if let redisEnvHostname = Environment.get("HOSTNAME_REDIS") {
          redisHostname = redisEnvHostname
@@ -89,8 +89,8 @@ public func configure(_ app: Application) throws {
     // app.middleware.use(error)
     
     app.logger.logLevel = .debug
-    app.http.server.configuration.port = port
-    app.http.server.configuration.hostname = serverHostname
+    // app.http.server.configuration.port = port
+    // app.http.server.configuration.hostname = serverHostname
     
     app.migrations.add(CreateSchemaRoles())
     app.migrations.add(CreateSchemaUser())
