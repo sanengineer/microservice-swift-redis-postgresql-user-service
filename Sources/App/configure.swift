@@ -7,8 +7,8 @@ import Redis
 public func configure(_ app: Application) throws {
     
     // let port: Int
-    let redisHostname: String
-    let redisPort: Int
+    // let redisHostname: String
+    // let redisPort: Int
     let redisUrl: String
     // let dbUrl: String
     
@@ -22,26 +22,25 @@ public func configure(_ app: Application) throws {
     //     port = 8081
     // }
     
-    if let redisEnvHostname = Environment.get("HOSTNAME_REDIS") {
-         redisHostname = redisEnvHostname
-    } else {
-        redisHostname = "localhost"
-    }
+    // if let redisEnvHostname = Environment.get("HOSTNAME_REDIS") {
+    //      redisHostname = redisEnvHostname
+    // } else {
+    //     redisHostname = "localhost"
+    // }
     
     
-    if let redisEnvPort = Environment.get("PORT_REDIS") {
-         redisPort = Int(redisEnvPort) ?? 6379
-    } else {
-        redisPort = 6379
-    }
+    // if let redisEnvPort = Environment.get("PORT_REDIS") {
+    //      redisPort = Int(redisEnvPort) ?? 6379
+    // } else {
+    //     redisPort = 6379
+    // }
 
-    if let redisUrlEnv = Environment.get("REDIS_URL"){
-        redisUrl = redisUrlEnv
-        app.redis.configuration = try RedisConfiguration(url: redisUrl)
-    } else {
-        // redisUrl = "http://\(redisHostname):\(redisPort)"
-        app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
+    guard let redisUrlEnv = Environment.get("REDIS_TLS_URL") else {
+        return print("No Env REDIS_URL")
     }
+    redisUrl = redisUrlEnv
+    app.redis.configuration = try RedisConfiguration(url: redisUrl)
+   
     
   
     // app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
