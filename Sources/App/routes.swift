@@ -48,7 +48,7 @@ func routes(_ app: Application) throws {
 
     if let dbUrlEnv = Environment.get("DATABASE_URL"){
         dbUrl = dbUrlEnv
-        app.databases.use(try .postgres(url: dbUrl), as: .psql)
+        try app.databases.use(.postgres(url: dbUrl), as: .psql)
         print("DB_URL: \(dbUrl)")
     } else {
         app.databases.use(.postgres(
