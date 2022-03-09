@@ -35,7 +35,7 @@ public func configure(_ app: Application) throws {
         redisPort = 6379
     }
 
-    if let redisUrlEnv = Environment.get("REDIS_TLS_URL"){
+    if let redisUrlEnv = Environment.get("REDIS_URL"){
         redisUrl = redisUrlEnv
         app.redis.configuration = try RedisConfiguration(url: redisUrl)
     } else {
@@ -47,7 +47,7 @@ public func configure(_ app: Application) throws {
     // app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
     // app.redis.configuration = try RedisConfiguration(url: redisUrl)
 
-    if let dbUrlEnv = Environment.get("DATABASE_URL"), var postgresConfig = PostgresConfiguration(url: dbUrlEnv) {
+    if let dbUrlEnv = Environment.get("DATABASE_URL_2"), var postgresConfig = PostgresConfiguration(url: dbUrlEnv) {
         postgresConfig.tlsConfiguration = .makeClientConfiguration()
         postgresConfig.tlsConfiguration?.certificateVerification = .none
         app.databases.use(.postgres(
@@ -66,6 +66,8 @@ public func configure(_ app: Application) throws {
             password: Environment.get("DB_PASSWORD")!,
             database: Environment.get("DB_NAME")!),
             as: .psql)
+
+        // app.databases.use(.postgres()
     }
     
     app.logger.logLevel = .debug
@@ -75,6 +77,7 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateSchemaRoles())
     app.migrations.add(CreateSchemaUser())
     app.migrations.add(SeedDBRoles())
+   
     
     //migration
     try app.autoMigrate().wait()
