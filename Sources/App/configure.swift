@@ -47,7 +47,7 @@ public func configure(_ app: Application) throws {
     // app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
     // app.redis.configuration = try RedisConfiguration(url: redisUrl)
 
-    if let dbUrlEnv = Environment.get("DATABASE_URL"), var postgresConfig = PostgresConfiguration(url: dbUrlEnv) {
+    if let dbUrlEnv = Environment.get("DATABASE_URL_2"), var postgresConfig = PostgresConfiguration(url: dbUrlEnv) {
         postgresConfig.tlsConfiguration = .makeClientConfiguration()
         postgresConfig.tlsConfiguration?.certificateVerification = .none
         app.databases.use(.postgres(
