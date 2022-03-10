@@ -18,8 +18,8 @@ final class UserAuthMiddleware: Middleware {
         }
        
          //debug
-        // print("\nTOKEN_HEADERS: \(token)")
-        // print("\nAUTH_URL: \(authUrl)")
+        print("\nTOKEN_HEADERS: \(token)")
+        print("\nAUTH_URL: \(authUrl)")
         
 
 

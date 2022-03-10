@@ -10,14 +10,16 @@ import Fluent
 
 final class AdminAuthMiddleware: Middleware {
     
-    let authHostname: String = Environment.get("SERVER_HOSTNAME")!
-    let authPort: Int = Int(Environment.get("SERVER_PORT")!)!
     let authUrl: String = Environment.get("SERVER_URL")!
 
     func respond(to request: Request, chainingTo next: Responder) -> EventLoopFuture<Response> {
         guard let token = request.headers.bearerAuthorization else {
             return request.eventLoop.future(error: Abort(.unauthorized))
         }
+
+        //debug
+        print("\nTOKEN_HEADERS: \(token)")
+        print("\nAUTH_URL: \(authUrl)")
         
         return request
             .client
