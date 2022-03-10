@@ -9,11 +9,14 @@ import Vapor
 
 struct RolesController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        let userRouteGroup = routes.grouped("role")
-        
-        userRouteGroup.get(use: getAllHandler)
-        userRouteGroup.post(use: createHandler)
-        userRouteGroup.put(":id", use: updateHandler)
+
+        let adminMiddleware = AdminAuthMiddleware()
+        let routeGroup = routes.grouped("role")
+        let routeGroupMiddleware = routeGroup.grouped(adminMiddleware)
+       
+        routeGroupMiddleware.get(use: getAllHandler)
+        routeGroupMiddleware.post(use: createHandler)
+        routeGroupMiddleware.put(":id", use: updateHandler)
     }
     
     func getAllHandler(_ req: Request) throws -> EventLoopFuture<[Role]> {

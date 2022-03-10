@@ -10,28 +10,22 @@ import Fluent
 
 final class UserAuthMiddleware: Middleware {
     
-    let authHostname: String = Environment.get("SERVER_HOSTNAME")!
-    let authPort: Int = Int(Environment.get("SERVER_PORT")!)!
     let authUrl: String = Environment.get("SERVER_URL")!
 
     func respond(to request: Request, chainingTo next: Responder) -> EventLoopFuture<Response> {
-        guard let token = request.headers.bearerAuthorization else {
+         guard let token = request.headers.bearerAuthorization else {
             return request.eventLoop.future(error: Abort(.unauthorized))
         }
+       
+         //debug
+        // print("\nTOKEN_HEADERS: \(token)")
+        // print("\nAUTH_URL: \(authUrl)")
         
-        // guard let id_params = request.parameters.get("id") else {
-        //     return request.eventLoop.future(error: Abort(.badRequest))
-        // }
-        
-        //debug
-        print("\n","HEADER_TOKEN: ", token)
-        // print("\n", "TEST", test)
-        
-        // print("\n","PARAMS_ID: ",id_params, "\n")
-        
+
+
         return request
             .client
-            .post("(\(authUrl)/user/auth/authenticate", beforeSend: {
+            .post("\(authUrl)/user/auth/authenticate", beforeSend: {
                 authRequest in
                 
                 //debug
@@ -42,42 +36,27 @@ final class UserAuthMiddleware: Middleware {
             })
         
             .flatMapThrowing { response in
-                guard let auth = try response.content.decode(Auth.self).role_id, auth == 1 else {
+                guard let role_id = try response.content.decode(Auth.self).role_id else {
+                    throw Abort(.unauthorized)
+                }
+                
+                if role_id == 3 || role_id == 1 {
+                guard response.status == .ok  else {
+                    if response.status == .unauthorized {
+                        throw Abort(.unauthorized, reason: "UNAUTHORIZED")
+                    } else {
+                        throw Abort(.internalServerError)
+                    }
+                }
+                } else {
                     throw Abort(.unauthorized)
                 }
 
-                // guard let  = try response.content.decode(Auth.self).role_id.self else {
-                //     throw Abort(.badRequest, reason: "ROLE_ID")
-                // }
-
-
-                // guard let params_uuid = UUID(uuidString: id_params) else {
-                //     throw Abort(.unauthorized, reason: "PARAMS_UUID")
-                // }
-                
-
-            //    if user_id == params_uuid {
-            //     guard response.status == .ok  else {
-            //         if response.status == .unauthorized {
-            //             throw Abort(.unauthorized, reason: "UNAUTHORIZED")
-            //         } else {
-            //             throw Abort(.internalServerError)
-            //         }
-            //     }
-            //     } else {
-            //         throw Abort(.unauthorized)
-            //     }
-
-            //   let data = User.query(on: request.db)
-            //    .filter(\.$id == user_id)
-            //    .all()
                        
-                
                //debug
                print("\n","RESPONSE:\n", response,"\n")
             //    print("\n", "TRYYY\n", try response.content.decode(Auth.self), "\n")
-               print("\n","USER:", auth,"\n")
-            //    print("\n","QUERY_DB:", data.self,"\n")
+               print("\n","ROLE_ID:", role_id,"\n")
             
             }
         

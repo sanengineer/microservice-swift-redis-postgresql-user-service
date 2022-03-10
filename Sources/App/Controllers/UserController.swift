@@ -4,18 +4,16 @@ struct UsersController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         
         let adminMiddleware = AdminAuthMiddleware()
+        let userMiddleware = UserAuthMiddleware()
         let routeGroup = routes.grouped("user")
-        let routeGroupMiddleware = routeGroup.grouped(adminMiddleware)
+        let routeGroupAdminMiddleware = routeGroup.grouped(adminMiddleware)
+        let routeGroupUserMiddleware = routeGroup.grouped(userMiddleware)
 
-
-        // let testGroup = routes.grouped("user")
-
-        routeGroupMiddleware.get( use: getAllHandler)
-        // testGroup.get("count", use: getUsersNumber)
-        routeGroupMiddleware.get("count", use: getUsersNumber)
-        routeGroupMiddleware.get(":id", use: getOneHanlder)
+        routeGroupAdminMiddleware.get( use: getAllHandler)
+        routeGroupAdminMiddleware.get("count", use: getUsersNumber)
+        routeGroupUserMiddleware.get(":id", use: getOneHandlder)
         routeGroup.post(use: createHandler)
-        routeGroupMiddleware.put(":id", use: updateBioHandler)
+        routeGroupUserMiddleware.put(":id", use: updateBioHandler)
     
     }
     
@@ -34,7 +32,7 @@ struct UsersController: RouteCollection {
             .count()
     }
     
-    func getOneHanlder(_ req: Request) -> EventLoopFuture<User.Public> {
+    func getOneHandlder(_ req: Request) -> EventLoopFuture<User.Public> {
         User.find(req.parameters.get("id"), on: req.db)
             .unwrap(or: Abort(.notFound))
             .convertToPublic()

@@ -5,46 +5,30 @@ import Redis
 
 
 public func configure(_ app: Application) throws {
-    
-    // let port: Int
-    // let redisHostname: String
-    // let redisPort: Int
-    let redisUrl: String
-    // let dbUrl: String
-    
-    // guard let serverHostname = Environment.get("SERVER_HOSTNAME") else {
-    //     return print("No Env Server Hostname")
-    // }
-    
-    // if let envPort = Environment.get("SERVER_PORT") {
-    //     port = Int(envPort) ?? 8081
-    // } else {
-    //     port = 8081
-    // }
-    
-    // if let redisEnvHostname = Environment.get("HOSTNAME_REDIS") {
-    //      redisHostname = redisEnvHostname
-    // } else {
-    //     redisHostname = "localhost"
-    // }
-    
-    
-    // if let redisEnvPort = Environment.get("PORT_REDIS") {
-    //      redisPort = Int(redisEnvPort) ?? 6379
-    // } else {
-    //     redisPort = 6379
-    // }
 
-    guard let redisUrlEnv = Environment.get("REDIS_URL") else {
-        return print("No Env REDIS_URL")
-    }
-    redisUrl = redisUrlEnv
-    app.redis.configuration = try RedisConfiguration(url: redisUrl)
-   
+    let port: Int
+    let redisUrl: String  
+    let redisHostname: String
+    let redisPort: Int
+
     
-  
-    // app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
-    // app.redis.configuration = try RedisConfiguration(url: redisUrl)
+
+    if let redisUrlEnv = Environment.get("REDIS_URL") {
+        redisUrl = redisUrlEnv
+        app.redis.configuration = try RedisConfiguration(url: redisUrl)
+    } else {
+        if let redisEnvHostname = Environment.get("HOSTNAME_REDIS") {
+            redisHostname = redisEnvHostname
+        } else {
+            redisHostname = "localhost"
+        }
+        if let redisEnvPort = Environment.get("PORT_REDIS") {
+            redisPort = Int(redisEnvPort) ?? 6379
+        } else {
+            redisPort = 6379
+        }
+        app.redis.configuration = try RedisConfiguration(hostname: redisHostname, port: redisPort)
+    }
 
     if let dbUrlEnv = Environment.get("DATABASE_URL"), var postgresConfig = PostgresConfiguration(url: dbUrlEnv) {
         postgresConfig.tlsConfiguration = .makeClientConfiguration()
@@ -53,6 +37,16 @@ public func configure(_ app: Application) throws {
             configuration: postgresConfig
         ), as: .psql)
     } else {
+        guard let serverHostname = Environment.get("SERVER_HOSTNAME") else {
+            return print("No Env Server Hostname")
+        }
+
+        if let envPort = Environment.get("SERVER_PORT") {
+            port = Int(envPort) ?? 8081
+        } else {
+            port = 8081
+        }
+
         app.databases.use(.postgres(
             hostname: Environment.get("DB_HOSTNAME")!,
             port: Environment.get("DB_PORT").flatMap(Int.init(_:))!,
@@ -60,6 +54,9 @@ public func configure(_ app: Application) throws {
             password: Environment.get("DB_PASSWORD")!,
             database: Environment.get("DB_NAME")!),
             as: .psql)
+        app.http.server.configuration.port = port
+        app.http.server.configuration.hostname = serverHostname
+        
     }
 
      let corsConfiguration = CORSMiddleware.Configuration(
@@ -81,16 +78,15 @@ public func configure(_ app: Application) throws {
     app.middleware.use(error)
     
     app.logger.logLevel = .debug
-    // app.http.server.configuration.port = port
-    // app.http.server.configuration.hostname = serverHostname
+   
     
     app.migrations.add(CreateSchemaRoles())
     app.migrations.add(CreateSchemaUser())
     app.migrations.add(SeedDBRoles())
    
     
-    //migration
-    try app.autoMigrate().wait()
+    //migration_for_first_deployment
+    // try app.autoMigrate().wait()
 
     //register routes
     try routes(app)
