@@ -15,7 +15,6 @@ struct RolesController: RouteCollection {
         let routeGroupMiddleware = routeGroup.grouped(adminMiddleware)
        
         routeGroupMiddleware.get(use: getAllHandler)
-        routeGroupMiddleware.post(use: createHandler)
         routeGroupMiddleware.put(":id", use: updateHandler)
     }
     

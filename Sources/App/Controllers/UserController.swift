@@ -2,19 +2,21 @@ import Vapor
 
 struct UsersController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
-        
-        let adminMiddleware = AdminAuthMiddleware()
-        let userMiddleware = UserAuthMiddleware()
+        let authSuperUser = AdminAuthMiddleware()
+        let authMidUser = UserAuthMiddleware()
+        let authUser = UserAuthMiddleware()
         let routeGroup = routes.grouped("user")
-        let routeGroupAdminMiddleware = routeGroup.grouped(adminMiddleware)
-        let routeGroupUserMiddleware = routeGroup.grouped(userMiddleware)
+        let routeGroupSuperUser = routeGroup.grouped(authSuperUser)
+        let routeGroupMidUser = routeGroup.grouped(authMidUser)
+        let routeGroupUser = routeGroup.grouped(authUser)
 
-        routeGroupAdminMiddleware.get( use: getAllHandler)
-        routeGroupAdminMiddleware.get("count", use: getUsersNumber)
-        routeGroupUserMiddleware.get(":id", use: getOneHandlder)
+        routeGroupMidUser.get("count", use: getUsersNumber)
+        routeGroupMidUser.get(":id", use: getOneHanlder)
+
+        routeGroupUser.get(use: getAllHandler)
+        routeGroupUser.put(":id", use: updateBioHandler)
+
         routeGroup.post(use: createHandler)
-        routeGroupUserMiddleware.put(":id", use: updateBioHandler)
-    
     }
     
     func getAllHandler(_ req: Request) -> EventLoopFuture<[User.Public]> {
